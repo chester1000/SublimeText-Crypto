@@ -69,6 +69,10 @@ def panel(window, message):
 def crypto(view, enc_flag, password, data):
   s = sublime.load_settings("Crypto.sublime-settings")
   cipher = s.get('cipher')
+  b64_enc = s.get('base64')
+
+  b64_flag = '-a' if b64_enc else ''
+
   openssl_command = os.path.normpath( s.get('openssl_command') )
 
   # pass the password as an ENV variable, for better security
@@ -77,7 +81,7 @@ def crypto(view, enc_flag, password, data):
   _pass = "env:%s" % envVar
 
   try:
-    openssl = Popen([openssl_command, "enc", enc_flag, cipher, "-base64", "-pass", _pass], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    openssl = Popen([openssl_command, "enc", enc_flag, cipher, "-base64", "-pass", _pass, b64_flag], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     openssl.stdin.write( data.encode("utf-8") )
     result, error = openssl.communicate()
     del os.environ[envVar] # get rid of the temporary ENV var
